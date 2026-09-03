@@ -72,6 +72,7 @@ jobs:
           ./gradlew assembleDebug --no-daemon --stacktrace
         env:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/${{ steps.setup-android.outputs.ndk-version }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
 
       - name: Rename APK
         run: |
