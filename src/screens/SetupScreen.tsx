@@ -61,7 +61,7 @@ const SetupScreen: React.FC<SetupScreenProps> = () => {
           if (!result.canceled && result.assets && result.assets.length > 0) {
             const folderPath = result.assets[0].uri;
             const folderName = folderPath.split('/').pop() || 'Music';
-            setMusicFolder(folderName);
+            setMusicFolder(folderPath);
             setName(folderName);
           }
         }

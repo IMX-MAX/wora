@@ -24,7 +24,7 @@ export const initDatabase = async (): Promise<SQLite.WebSQLDatabase> => {
         'PRAGMA foreign_keys = ON;',
         [],
         () => resolve(),
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -40,7 +40,7 @@ export const initDatabase = async (): Promise<SQLite.WebSQLDatabase> => {
         });
       });
       resolve();
-    }, (_, error) => reject(error));
+    }, (_, error) => { reject(error); return false; });
   });
 
   return db;
@@ -68,7 +68,7 @@ export const getSettings = async (): Promise<Settings | null> => {
             resolve(null);
           }
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -101,7 +101,7 @@ export const updateSettings = async (settings: Partial<Settings>): Promise<Setti
               reject(new Error('Failed to update settings'));
             }
           },
-          (_, error) => reject(error)
+          (_, error) => { reject(error); return false; }
         );
       } else {
         tx.executeSql(
@@ -116,9 +116,9 @@ export const updateSettings = async (settings: Partial<Settings>): Promise<Setti
             updatedSettings.scrobbleThreshold || 50
           ],
           (_, { insertId }) => {
-            resolve({ ...updatedSettings, id: insertId });
+            resolve({ ...updatedSettings, id: insertId || 0 });
           },
-          (_, error) => reject(error)
+          (_, error) => { reject(error); return false; }
         );
       }
     });
@@ -134,9 +134,9 @@ export const insertAlbum = async (album: Omit<Album, 'id'>): Promise<Album> => {
         `INSERT INTO ${TABLE_NAMES.ALBUMS} (name, artist, year, cover) VALUES (?, ?, ?, ?)`,
         [album.name, album.artist, album.year || null, album.cover || null],
         (_, { insertId }) => {
-          resolve({ ...album, id: insertId });
+          resolve({ ...album, id: insertId || 0 });
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -157,7 +157,7 @@ export const getAlbums = async (page: number = 1, limit: number = 20): Promise<A
           }
           resolve(albums);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -176,7 +176,7 @@ export const getAlbumById = async (id: number): Promise<Album | null> => {
             resolve(null);
           }
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -213,7 +213,7 @@ export const getAlbumWithSongs = async (albumId: number): Promise<Album | null> 
           
           resolve({ ...album, songs });
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -228,9 +228,9 @@ export const insertSong = async (song: Omit<Song, 'id'>): Promise<Song> => {
         `INSERT INTO ${TABLE_NAMES.SONGS} (filePath, name, artist, duration, albumId) VALUES (?, ?, ?, ?, ?)`,
         [song.filePath, song.name, song.artist, song.duration, song.albumId || null],
         (_, { insertId }) => {
-          resolve({ ...song, id: insertId });
+          resolve({ ...song, id: insertId || 0 });
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -274,10 +274,10 @@ export const getSongs = async (page: number = 1, limit: number = 20): Promise<{ 
               }
               resolve({ songs, total });
             },
-            (_, error) => reject(error)
+            (_, error) => { reject(error); return false; }
           );
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -311,7 +311,7 @@ export const getSongById = async (id: number): Promise<Song | null> => {
             resolve(null);
           }
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -347,7 +347,7 @@ export const searchSongs = async (query: string): Promise<Song[]> => {
           }
           resolve(songs);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -362,9 +362,9 @@ export const createPlaylist = async (playlist: Omit<Playlist, 'id' | 'createdAt'
         `INSERT INTO ${TABLE_NAMES.PLAYLISTS} (name, description, cover) VALUES (?, ?, ?)`,
         [playlist.name, playlist.description, playlist.cover],
         (_, { insertId }) => {
-          resolve({ ...playlist, id: insertId, createdAt: new Date().toISOString() });
+          resolve({ ...playlist, id: insertId || 0, createdAt: new Date().toISOString() });
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -383,7 +383,7 @@ export const getPlaylists = async (): Promise<Playlist[]> => {
           }
           resolve(playlists);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -402,7 +402,7 @@ export const getPlaylistById = async (id: number): Promise<Playlist | null> => {
             resolve(null);
           }
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -446,7 +446,7 @@ export const getPlaylistWithSongs = async (playlistId: number): Promise<Playlist
           
           resolve({ ...playlist, songs });
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -465,7 +465,7 @@ export const updatePlaylist = async (playlist: Playlist): Promise<Playlist> => {
             reject(new Error('Playlist not found'));
           }
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -480,7 +480,7 @@ export const deletePlaylist = async (playlistId: number): Promise<boolean> => {
         (_, { rowsAffected }) => {
           resolve(rowsAffected > 0);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -495,14 +495,14 @@ export const addSongToPlaylist = async (playlistId: number, songId: number): Pro
         `INSERT OR IGNORE INTO ${TABLE_NAMES.PLAYLIST_SONGS} (playlistId, songId) VALUES (?, ?)`,
         [playlistId, songId],
         (_, { insertId }) => {
-          if (insertId > 0) {
+          if ((insertId || 0) > 0) {
             resolve({ playlistId, songId });
           } else {
             // Already exists
             resolve({ playlistId, songId });
           }
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -517,7 +517,7 @@ export const removeSongFromPlaylist = async (playlistId: number, songId: number)
         (_, { rowsAffected }) => {
           resolve(rowsAffected > 0);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -544,7 +544,7 @@ export const savePlaylistLyrics = async (
         ],
         (_, { insertId }) => {
           resolve({
-            id: insertId,
+            id: insertId || 0,
             playlistId,
             songId,
             lyrics: JSON.stringify(lyrics),
@@ -552,7 +552,7 @@ export const savePlaylistLyrics = async (
             fetchedAt: new Date().toISOString()
           });
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -577,7 +577,7 @@ export const getCachedLyrics = async (playlistId: number, songId: number): Promi
             resolve(null);
           }
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -602,7 +602,7 @@ export const getAllCachedLyricsForPlaylist = async (playlistId: number): Promise
           }
           resolve(lyricsMap);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -617,7 +617,7 @@ export const deleteCachedLyrics = async (playlistId: number, songId: number): Pr
         (_, { rowsAffected }) => {
           resolve(rowsAffected > 0);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -632,7 +632,7 @@ export const clearPlaylistLyricsCache = async (playlistId: number): Promise<bool
         (_, { rowsAffected }) => {
           resolve(rowsAffected > 0);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -647,9 +647,9 @@ export const addToFavorites = async (songId: number): Promise<boolean> => {
         `INSERT OR IGNORE INTO ${TABLE_NAMES.FAVORITES} (songId) VALUES (?)`,
         [songId],
         (_, { insertId }) => {
-          resolve(insertId > 0);
+          resolve((insertId || 0) > 0);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -664,7 +664,7 @@ export const removeFromFavorites = async (songId: number): Promise<boolean> => {
         (_, { rowsAffected }) => {
           resolve(rowsAffected > 0);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -679,7 +679,7 @@ export const isSongFavorite = async (songId: number): Promise<boolean> => {
         (_, { rows }) => {
           resolve(rows.length > 0);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -713,7 +713,7 @@ export const getFavorites = async (): Promise<Song[]> => {
           }
           resolve(songs);
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -762,19 +762,19 @@ export const getLibraryStats = async (): Promise<LibraryStats> => {
                             totalDuration,
                           });
                         },
-                        (_, error) => reject(error)
+                        (_, error) => { reject(error); return false; }
                       );
                     },
-                    (_, error) => reject(error)
+                    (_, error) => { reject(error); return false; }
                   );
                 },
-                (_, error) => reject(error)
+                (_, error) => { reject(error); return false; }
               );
             },
-            (_, error) => reject(error)
+            (_, error) => { reject(error); return false; }
           );
         },
-        (_, error) => reject(error)
+        (_, error) => { reject(error); return false; }
       );
     });
   });
@@ -799,7 +799,7 @@ export const clearDatabase = async (): Promise<void> => {
               resolve();
             }
           },
-          (_, error) => reject(error)
+          (_, error) => { reject(error); return false; }
         );
       });
     });
@@ -820,13 +820,13 @@ export const insertAlbumsBatch = async (albums: Omit<Album, 'id'>[]): Promise<Al
           `INSERT OR IGNORE INTO ${TABLE_NAMES.ALBUMS} (name, artist, year, cover) VALUES (?, ?, ?, ?)`,
           [album.name, album.artist, album.year || null, album.cover || null],
           (_, { insertId }) => {
-            insertedAlbums.push({ ...album, id: insertId });
+            insertedAlbums.push({ ...album, id: insertId || 0 });
             completed++;
             if (completed === total) {
               resolve(insertedAlbums);
             }
           },
-          (_, error) => reject(error)
+          (_, error) => { reject(error); return false; }
         );
       });
     });
@@ -845,13 +845,13 @@ export const insertSongsBatch = async (songs: Omit<Song, 'id'>[]): Promise<Song[
           `INSERT OR IGNORE INTO ${TABLE_NAMES.SONGS} (filePath, name, artist, duration, albumId) VALUES (?, ?, ?, ?, ?)`,
           [song.filePath, song.name, song.artist, song.duration, song.albumId || null],
           (_, { insertId }) => {
-            insertedSongs.push({ ...song, id: insertId });
+            insertedSongs.push({ ...song, id: insertId || 0 });
             completed++;
             if (completed === total) {
               resolve(insertedSongs);
             }
           },
-          (_, error) => reject(error)
+          (_, error) => { reject(error); return false; }
         );
       });
     });

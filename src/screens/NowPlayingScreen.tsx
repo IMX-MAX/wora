@@ -40,7 +40,7 @@ const NowPlayingScreen: React.FC<NowPlayingScreenProps> = () => {
           const { lyrics: fetchedLyrics, isSynced: synced } = await getLyrics(
             player.song.name,
             player.song.artist,
-            player.song.duration,
+            player.song.duration || 0,
             player.song.id
           );
           setLyrics(fetchedLyrics);
@@ -152,14 +152,14 @@ const NowPlayingScreen: React.FC<NowPlayingScreenProps> = () => {
               style={styles.slider}
               minimumValue={0}
               maximumValue={1}
-              value={player.song.duration > 0 ? player.seek / player.song.duration : 0}
-              onSlidingComplete={(value) => handleSeek(value)}
+              value={player.song && player.song.duration && player.song.duration > 0 ? player.seek / player.song.duration : 0}
+              onSlidingComplete={(value: number) => handleSeek(value)}
               minimumTrackTintColor="#6366f1"
               maximumTrackTintColor="#4b5563"
               thumbTintColor="#6366f1"
             />
             <Text style={styles.progressTime}>
-              {formatTime(player.song.duration)}
+              {formatTime(player.song.duration || 0)}
             </Text>
           </View>
 
@@ -194,7 +194,7 @@ const NowPlayingScreen: React.FC<NowPlayingScreenProps> = () => {
                 onPress={() => player.toggleRepeat()}
               >
                 <Ionicons
-                  name={player.repeat ? 'repeat' : 'repeat-off'}
+                  name={player.repeat ? 'repeat' : 'repeat'}
                   size={24}
                   color={player.repeat ? '#6366f1' : '#9ca3af'}
                 />
@@ -227,7 +227,7 @@ const NowPlayingScreen: React.FC<NowPlayingScreenProps> = () => {
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Duration</Text>
-              <Text style={styles.infoValue}>{formatTime(player.song.duration)}</Text>
+              <Text style={styles.infoValue}>{formatTime(player.song.duration || 0)}</Text>
             </View>
           </View>
 

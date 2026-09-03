@@ -82,8 +82,8 @@ const PlaylistsScreen: React.FC<PlaylistsScreenProps> = () => {
 
   const handlePlayPlaylist = useCallback((playlist: Playlist) => {
     // Play the first song in the playlist
-    if (playlist.songs && playlist.songs.length > 0) {
-      player.setQueueAndPlay(playlist.songs, 0);
+    if (playlist.songs || [] && playlist.songs || [].length > 0) {
+      player.setQueueAndPlay(playlist.songs || [], 0);
     }
   }, [player]);
 

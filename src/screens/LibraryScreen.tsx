@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { usePlayer } from '../context/PlayerContext';
-import { getSongs, getAlbums, getAllArtists } from '../database';
+import { getSongs, getAlbums, getAlbums } from '../database';
 import { Song, Album } from '../types';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
