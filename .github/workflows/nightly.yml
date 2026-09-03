@@ -32,7 +32,7 @@ jobs:
           path: |
             ~/.npm
             ~/.cache/expo
-          key: ${{ runner.os }}-expo-nightly-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-expo-nightly-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-expo-nightly-
 

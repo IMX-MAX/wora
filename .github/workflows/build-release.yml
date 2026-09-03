@@ -46,7 +46,7 @@ jobs:
           path: |
             ~/.npm
             ~/.cache/expo
-          key: ${{ runner.os }}-expo-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-expo-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-expo-
 
