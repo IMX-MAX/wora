@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify React Native gradle files
+        run: ls node_modules/react-native/gradle/libs.versions.toml
+
       - name: Install Expo CLI
         run: npm install -g expo-cli
 
