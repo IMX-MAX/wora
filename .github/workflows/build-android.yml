@@ -51,8 +51,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-expo-
 
+      - name: Clean Android directory
+        run: rm -rf android
+
       - name: Prebuild Android
-        run: npx expo prebuild --platform android --no-install
+        run: npx expo prebuild --platform android --clean --no-install
         env:
           EXPO_NO_DEV_TOOLS: 1
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
